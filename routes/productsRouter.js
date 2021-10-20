@@ -1,50 +1,40 @@
 const express = require('express');
-const faker = require('faker');
 const router = express.Router();
-const port = 8080;
+const productsServices = require('../services/productsServices.js');
+
+const productService = new productsServices();
 
 router.get('/', (request, response) => {
-  const products = [];
-
-  const {limit, offset} = request.query;
-  const sizeArray = limit || 10;
-
-  for(let i = 0; i < sizeArray; i++){
-    products.push({
-      name: faker.commerce.productName(),
-      price: parseInt(faker.commerce.price(), 10),
-      image: faker.image.imageUrl()
-    })
-  }
-  response.json(products)
+  const products = productService.find();
+  response.json(products);
 });
 
 router.post('/', (request, response) => {
   const body = request.body;
-  response.status(201).json({
-    message: "product created",
-    data: body
-  })
+  const newProduct = productService.create(body);
+  response.status(201).json(newProduct);
 });
 
 router.patch('/:id', (request, response) => {
   const {id} = request.params;
   const body = request.body;
-  response.json({
-    message: "product updated partially",
-    data: body,
-    id
-  })
+  const updateProduct = productService.update(id, body);
+  response.json(updateProduct);
 });
 
 router.delete('/:id', (request, response) => {
   const {id} = request.params;
-  response.json({
-    message: "product deleted",
-    id
-  })
+  const deleteProduct = productService.delete(id);
+  response.json(deleteProduct);
 });
 
+router.get('/:id', (request, response) => {
+  const {id} = request.params;
+  const product = productService.findOne(id);
+  response.json(product);
+});
+
+/*
 router.get('/filter', (request, response) => {
   response.send("Soy un filtro");
 });
@@ -60,14 +50,6 @@ router.get('/products/query', (request, response) => {
     response.send("No hay parámetros");
   }
 });
-
-router.get('/:id', (request, response) => {
-  const {id} = request.params;
-  request.json({
-    id,
-    name: 'Product 2',
-    price: 2000
-  });
-});
+*/
 
 module.exports = router;
