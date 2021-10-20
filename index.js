@@ -3,7 +3,7 @@ const app = express();
 const port = 8080;
 
 const routerAPI = require('./routes');
-const { logErrors, errorHandler } = require('./middlewares/errorHandler');
+const { logErrors, errorHandler, boomErrorHandler } = require('./middlewares/errorHandler');
 
 app.get('/', (request, response) => {
   response.send("Hola este es mi server en Express");
@@ -12,6 +12,7 @@ app.get('/', (request, response) => {
 routerAPI(app);
 
 app.use(logErrors);
+app.use(boomErrorHandler);
 app.use(errorHandler);
 
 app.listen(port, () => {

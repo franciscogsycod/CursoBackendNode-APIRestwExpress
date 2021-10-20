@@ -15,7 +15,7 @@ router.post('/', async (request, response) => {
   response.status(201).json(newProduct);
 });
 
-router.patch('/:id', async (request, response) => {
+router.patch('/:id', async (request, response, next) => {
 
   try {
     const {id} = request.params;
@@ -23,11 +23,10 @@ router.patch('/:id', async (request, response) => {
     const updateProduct = await productService.update(id, body);
     response.json(updateProduct);
   } catch (error) {
-    response.status(404).json({
-      message: error.message
-    });
+      next(error);
+    };
   }
-});
+);
 
 router.delete('/:id', async (request, response) => {
   const {id} = request.params;
