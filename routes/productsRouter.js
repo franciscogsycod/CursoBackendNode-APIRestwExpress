@@ -4,34 +4,45 @@ const productsServices = require('../services/productsServices.js');
 
 const productService = new productsServices();
 
-router.get('/', (request, response) => {
-  const products = productService.find();
+router.get('/', async (request, response) => {
+  const products = await productService.find();
   response.json(products);
 });
 
-router.post('/', (request, response) => {
+router.post('/', async (request, response) => {
   const body = request.body;
-  const newProduct = productService.create(body);
+  const newProduct = await productService.create(body);
   response.status(201).json(newProduct);
 });
 
-router.patch('/:id', (request, response) => {
-  const {id} = request.params;
-  const body = request.body;
-  const updateProduct = productService.update(id, body);
-  response.json(updateProduct);
+router.patch('/:id', async (request, response) => {
+
+  try {
+    const {id} = request.params;
+    const body = request.body;
+    const updateProduct = await productService.update(id, body);
+    response.json(updateProduct);
+  } catch (error) {
+    response.status(404).json({
+      message: error.message
+    });
+  }
 });
 
-router.delete('/:id', (request, response) => {
+router.delete('/:id', async (request, response) => {
   const {id} = request.params;
-  const deleteProduct = productService.delete(id);
+  const deleteProduct = await productService.delete(id);
   response.json(deleteProduct);
 });
 
-router.get('/:id', (request, response) => {
-  const {id} = request.params;
-  const product = productService.findOne(id);
-  response.json(product);
+router.get('/:id', async (request, response, next) => {
+  try {
+    const {id} = request.params;
+    const product = await productService.findOne(id);
+    response.json(product);
+  } catch (error) {
+    next(error);
+  }
 });
 
 /*
