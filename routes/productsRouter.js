@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const productsServices = require('../services/productsServices.js');
+const validationHandler = require('../middlewares/validationHandler');
+const { createProductSchema, updateProductSchema, getProductSchema } = require('../schemas/productSchema');
 
 const productService = new productsServices();
 
@@ -9,14 +11,18 @@ router.get('/', async (request, response) => {
   response.json(products);
 });
 
-router.post('/', async (request, response) => {
+router.post('/',
+  validationHandler(createProductSchema,'body'),
+  async (request, response) => {
   const body = request.body;
   const newProduct = await productService.create(body);
   response.status(201).json(newProduct);
 });
 
-router.patch('/:id', async (request, response, next) => {
-
+router.patch('/:id',
+  validationHandler(getProductSchema, 'params'),
+  validationHandler(updateProductSchema, 'body'),
+  async (request, response, next) => {
   try {
     const {id} = request.params;
     const body = request.body;
@@ -34,7 +40,9 @@ router.delete('/:id', async (request, response) => {
   response.json(deleteProduct);
 });
 
-router.get('/:id', async (request, response, next) => {
+router.get('/:id',
+  validationHandler(getProductSchema, 'params'),
+  async (request, response, next) => {
   try {
     const {id} = request.params;
     const product = await productService.findOne(id);
